@@ -1,0 +1,32 @@
+
+services:
+  api:
+    build: ./api
+    ports:
+      - "5000:8080"
+    environment:
+      ASPNETCORE_URLS: "http://+:8080"
+      Message: "Hello from Docker Compose!"
+      Logging__LogLevel__Default: "Information"
+
+  web:
+    build:
+      context: ./web
+      args:
+        VITE_API_URL: "http://localhost:5000"
+    ports:
+      - "3000:80"
+    depends_on:
+      - api
+
+  db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: appuser
+      POSTGRES_PASSWORD: change_me_123
+      POSTGRES_DB: appdb
+    volumes:
+      - db-data:/var/lib/postgresql/data
+
+volumes:
+  db-data:
